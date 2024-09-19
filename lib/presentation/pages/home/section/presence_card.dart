@@ -67,7 +67,7 @@ class PresenceCard extends ConsumerWidget {
                         ),
                       ),
                       Text(
-                        DateFormat.jms().format(DateTime.now()),
+                        DateFormat("hh:mm a").format(DateTime.now()),
                         style: Typogaphy.Bold.copyWith(
                           fontSize: 16,
                           color: Colors.white,
@@ -96,7 +96,7 @@ class PresenceCard extends ConsumerWidget {
                         ),
                       ),
                       Text(
-                        DateFormat.jms().format(DateTime.now()),
+                        DateFormat("hh:mm a").format(DateTime.now()),
                         style: Typogaphy.Bold.copyWith(
                           fontSize: 16,
                           color: Colors.white,

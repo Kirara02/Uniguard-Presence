@@ -1,7 +1,7 @@
-import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 import 'package:unipres/presentation/misc/app_routes.dart';
+import 'package:unipres/presentation/pages/all_presence/all_presence_page.dart';
 import 'package:unipres/presentation/pages/forgot_password/forgot_password.dart';
 import 'package:unipres/presentation/pages/login/login_page.dart';
 import 'package:unipres/presentation/pages/main/main_page.dart';
@@ -38,6 +38,13 @@ Raw<GoRouter> router(RouterRef ref) => GoRouter(
           name: "forgot_password",
           builder: (context, state) {
             return const ForgotPassword();
+          },
+        ),
+        GoRoute(
+          path: Routes.ALL_PRESENCE,
+          name: "all-presence",
+          builder: (context, state) {
+            return const AllPresencePage();
           },
         ),
       ],

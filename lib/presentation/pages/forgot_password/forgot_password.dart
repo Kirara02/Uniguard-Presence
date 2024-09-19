@@ -8,7 +8,7 @@ class ForgotPassword extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("Forgot Password"),
+        title: const Text("Forgot Password"),
       ),
     );
   }

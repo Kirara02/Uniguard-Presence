@@ -1,14 +1,15 @@
 import 'package:unipres/data/repositories/auth_repository.dart';
 import 'package:unipres/domain/entities/result.dart';
+import 'package:unipres/domain/entities/user.dart';
 import 'package:unipres/presentation/misc/api_client.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
   final ApiClient _apiClient;
 
-  AuthRepositoryImpl(this._apiClient);
+  AuthRepositoryImpl({ApiClient? apiClient}) : _apiClient = apiClient ?? ApiClient();
 
   @override
-  Future<Result<void>> login({
+  Future<Result<User>> login({
     required String email,
     required String password,
   }) async {
@@ -22,7 +23,7 @@ class AuthRepositoryImpl implements AuthRepository {
       );
 
       if (response.statusCode == 200) {
-        final results = List<Map<String, dynamic>>.from(response.data);
+        final results = User.fromJson(response.data);
         // Handle successful login
         return Result.success(results);
       } else {
@@ -42,7 +43,7 @@ class AuthRepositoryImpl implements AuthRepository {
 
       if (response.statusCode == 200) {
         // Handle successful logout
-        return Result.success(null);
+        return const Result.success(null);
       } else {
         // Handle error response
         return Result.failed('Logout failed: ${response.statusMessage}');
@@ -51,5 +52,11 @@ class AuthRepositoryImpl implements AuthRepository {
       // Handle network or other errors
       return Result.failed('Logout error: $e');
     }
+  }
+  
+  @override
+  Future<bool> getLoggedInUser() {
+    // TODO: implement getLoggedInUser
+    throw UnimplementedError();
   }
 }

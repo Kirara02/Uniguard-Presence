@@ -1,19 +1,34 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:unipres/presentation/extension/build_context_extension.dart';
 import 'package:unipres/presentation/misc/app_routes.dart';
 import 'package:unipres/presentation/misc/colors.dart';
 import 'package:unipres/presentation/misc/typography.dart';
 import 'package:unipres/presentation/providers/routes/router_provider.dart';
+import 'package:unipres/presentation/providers/user_data/user_data_provider.dart';
 import 'package:unipres/presentation/widgets/textfield/custom_text_field.dart';
 
 class LoginPage extends ConsumerWidget {
-  LoginPage({super.key});
-
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
+  const LoginPage({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+    final TextEditingController emailController = TextEditingController();
+    final TextEditingController passwordController = TextEditingController();
+
+    ref.listen(
+      userDataProvider,
+      (previous, next) {
+        if (next is AsyncData) {
+          if (next.value != null) {
+            ref.read(routerProvider).go(Routes.MAIN);
+          }
+        } else if (next is AsyncError) {
+          context.showSnackBar(next.error.toString());
+        }
+      },
+    );
+
     return Scaffold(
       backgroundColor: AppColors.primary,
       body: ListView(
@@ -49,8 +64,7 @@ class LoginPage extends ConsumerWidget {
             height: MediaQuery.of(context).size.height * 65 / 100,
             width: MediaQuery.of(context).size.width,
             color: Colors.white,
-            padding:
-                const EdgeInsets.only(left: 20, right: 20, top: 36, bottom: 84),
+            padding: const EdgeInsets.only(left: 20, right: 20, top: 36, bottom: 84),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.start,
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -75,36 +89,46 @@ class LoginPage extends ConsumerWidget {
                   obscureText: true,
                   controller: passwordController,
                 ),
-                SizedBox(
-                  width: MediaQuery.of(context).size.width,
-                  child: ElevatedButton(
-                    onPressed: () async {
-                      ref.watch(routerProvider).go(Routes.MAIN);
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppColors.primary,
-                      padding: const EdgeInsets.symmetric(vertical: 18),
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                      ),
+                switch (ref.watch(userDataProvider)) {
+                  AsyncData(:final value) => value == null
+                      ? SizedBox(
+                          width: MediaQuery.of(context).size.width,
+                          child: ElevatedButton(
+                            onPressed: () async {
+                              ref
+                                  .read(userDataProvider.notifier)
+                                  .login(email: emailController.text, password: passwordController.text);
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primary,
+                              padding: const EdgeInsets.symmetric(vertical: 18),
+                              elevation: 0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                            ),
+                            child: Text(
+                              'Login',
+                              style: Typogaphy.Medium.copyWith(
+                                fontSize: 16,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        )
+                      : const Center(
+                          child: CircularProgressIndicator(),
+                        ),
+                  _ => const Center(
+                      child: CircularProgressIndicator(),
                     ),
-                    child: Text(
-                      'Login',
-                      style: Typogaphy.Medium.copyWith(
-                        fontSize: 16,
-                        color: Colors.white,
-                      ),
-                    ),
-                  ),
-                ),
+                },
                 Container(
                   width: MediaQuery.of(context).size.width,
                   margin: const EdgeInsets.only(top: 4),
                   alignment: Alignment.centerLeft,
                   child: TextButton(
-                    onPressed: () =>
-                        ref.watch(routerProvider).push(Routes.FORGOT_PASSWORD),
+                    onPressed: () => ref.watch(routerProvider).push(Routes.FORGOT_PASSWORD),
                     child: const Text("Forgot your password?"),
                   ),
                 ),

@@ -1,11 +1,15 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:unipres/presentation/extension/build_context_extension.dart';
 import 'package:unipres/presentation/misc/app_routes.dart';
 import 'package:unipres/presentation/misc/colors.dart';
 import 'package:unipres/presentation/pages/home/home_page.dart';
 import 'package:unipres/presentation/pages/profile/profile_page.dart';
 import 'package:unipres/presentation/providers/routes/router_provider.dart';
+import 'package:unipres/presentation/providers/user_data/user_data_provider.dart';
 
 class MainPage extends ConsumerStatefulWidget {
   const MainPage({super.key});
@@ -20,6 +24,18 @@ class _MainPageState extends ConsumerState<MainPage> {
 
   @override
   Widget build(BuildContext context) {
+    ref.listen(
+      userDataProvider,
+      (previous, next) {
+        if (previous != null && next is AsyncData && next.value == null) {
+          log("logout");
+          ref.read(routerProvider).go(Routes.LOGIN);
+        } else if (next is AsyncError) {
+          context.showSnackBar(next.error.toString());
+        }
+      },
+    );
+
     return Scaffold(
       extendBody: true,
       body: Stack(
@@ -50,8 +66,7 @@ class _MainPageState extends ConsumerState<MainPage> {
                 width: MediaQuery.of(context).size.width,
                 decoration: BoxDecoration(
                   border: Border(
-                    top: BorderSide(
-                        color: AppColors.secondaryExtraSoft, width: 1),
+                    top: BorderSide(color: AppColors.secondaryExtraSoft, width: 1),
                   ),
                 ),
                 child: BottomAppBar(
@@ -64,10 +79,9 @@ class _MainPageState extends ConsumerState<MainPage> {
                           onTap: () => setState(() {
                             selectedIndex = 0;
                             pageController.animateToPage(selectedIndex,
-                                duration: const Duration(milliseconds: 200),
-                                curve: Curves.easeInOut);
+                                duration: const Duration(milliseconds: 200), curve: Curves.easeInOut);
                           }),
-                          child: Container(
+                          child: SizedBox(
                             height: 65,
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -75,10 +89,8 @@ class _MainPageState extends ConsumerState<MainPage> {
                                 Container(
                                   margin: const EdgeInsets.only(bottom: 4),
                                   child: (selectedIndex == 0)
-                                      ? SvgPicture.asset(
-                                          'assets/icons/home-active.svg')
-                                      : SvgPicture.asset(
-                                          'assets/icons/home.svg'),
+                                      ? SvgPicture.asset('assets/icons/home-active.svg')
+                                      : SvgPicture.asset('assets/icons/home.svg'),
                                 ),
                                 Text(
                                   "Home",
@@ -109,10 +121,9 @@ class _MainPageState extends ConsumerState<MainPage> {
                           onTap: () => setState(() {
                             selectedIndex = 1;
                             pageController.animateToPage(selectedIndex,
-                                duration: const Duration(milliseconds: 200),
-                                curve: Curves.easeInOut);
+                                duration: const Duration(milliseconds: 200), curve: Curves.easeInOut);
                           }),
-                          child: Container(
+                          child: SizedBox(
                             height: 65,
                             child: Column(
                               mainAxisAlignment: MainAxisAlignment.center,
@@ -120,10 +131,8 @@ class _MainPageState extends ConsumerState<MainPage> {
                                 Container(
                                   margin: const EdgeInsets.only(bottom: 4),
                                   child: (selectedIndex == 1)
-                                      ? SvgPicture.asset(
-                                          'assets/icons/profile-active.svg')
-                                      : SvgPicture.asset(
-                                          'assets/icons/profile.svg'),
+                                      ? SvgPicture.asset('assets/icons/profile-active.svg')
+                                      : SvgPicture.asset('assets/icons/profile.svg'),
                                 ),
                                 Text(
                                   "Profile",
@@ -148,8 +157,7 @@ class _MainPageState extends ConsumerState<MainPage> {
                 width: 64,
                 height: 64,
                 child: FloatingActionButton(
-                  onPressed: () =>
-                      ref.watch(routerProvider).push(Routes.SPLASH),
+                  onPressed: () => ref.watch(routerProvider).push(Routes.SPLASH),
                   elevation: 0,
                   shape: const CircleBorder(),
                   child: SvgPicture.asset(
